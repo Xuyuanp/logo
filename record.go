@@ -13,6 +13,7 @@ var recordPool = sync.Pool{
 	},
 }
 
+// Record is a unit of log message.
 type Record struct {
 	Line    int
 	Level   LogLevel
@@ -22,12 +23,14 @@ type Record struct {
 	Message string
 }
 
+// NewRecord returns a reused Record.
 func NewRecord() *Record {
 	rec := recordPool.Get().(*Record)
 	rec.Reset()
 	return rec
 }
 
+// Reset sets all fields to default value.
 func (rec *Record) Reset() {
 	rec.Line = 0
 	rec.Level = LevelDebug
@@ -37,6 +40,7 @@ func (rec *Record) Reset() {
 	rec.Time = time.Now()
 }
 
+// Init initializes the file and line fieds.
 func (rec *Record) Init(skip int, level LogLevel, message string) {
 	_, lfile, line, ok := runtime.Caller(skip)
 	if !ok {

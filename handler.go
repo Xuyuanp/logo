@@ -38,8 +38,12 @@ func LevelHandlerFilter(level LogLevel) HandlerFilter {
 	}
 }
 
+// DefaultHandler is the default global Handler that writes log message
+// to Stdout using DefaultFormatter.
 var DefaultHandler = WriterHandler(os.Stdout, DefaultFormatter)
 
+// WriterHandler returns a new Handler with the provided writer
+// and Formatter.
 func WriterHandler(w io.Writer, fmter Formatter) Handler {
 	return func(rec *Record) {
 		fmt.Fprintln(w, fmter.Format(rec))
