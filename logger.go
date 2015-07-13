@@ -8,6 +8,8 @@ func (l Logger) Log(level LogLevel, format string, args ...interface{}) {
 	l(level, format, args...)
 }
 
+var defaultLogger = defaultLogo.Skip(2)
+
 // Log calls DefaultLogo's Log method.
 func Log(level LogLevel, format string, args ...interface{}) {
 	DefaultLogo().Output(2, level, format, args...)
@@ -15,25 +17,25 @@ func Log(level LogLevel, format string, args ...interface{}) {
 
 // Debug logs Debug level message.
 func Debug(format string, args ...interface{}) {
-	DefaultLogo().Output(2, LevelDebug, format, args...)
+	defaultLogger.Log(LevelDebug, format, args...)
 }
 
 // Info logs Info level message
 func Info(format string, args ...interface{}) {
-	DefaultLogo().Output(2, LevelInfo, format, args...)
+	defaultLogger.Log(LevelInfo, format, args...)
 }
 
 // Warning logs Warning level message.
 func Warning(format string, args ...interface{}) {
-	DefaultLogo().Output(2, LevelWarning, format, args...)
+	defaultLogger.Log(LevelWarning, format, args...)
 }
 
 // Error logs Error level message.
 func Error(format string, args ...interface{}) {
-	DefaultLogo().Output(2, LevelError, format, args...)
+	defaultLogger.Log(LevelError, format, args...)
 }
 
 // Critical logs Critical level message
 func Critical(format string, args ...interface{}) {
-	DefaultLogo().Output(2, LevelCritical, format, args...)
+	defaultLogger.Log(LevelCritical, format, args...)
 }
