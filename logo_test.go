@@ -5,9 +5,6 @@ import (
 	"testing"
 )
 
-func TestLogo(t *testing.T) {
-}
-
 func BenchmarkNewLogo(b *testing.B) {
 	benchmarkTask(b, func(i int) {
 		NewLogo(LevelDebug)
