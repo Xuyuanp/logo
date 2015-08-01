@@ -5,23 +5,6 @@ import "fmt"
 // Logo function type
 type Logo func(depth int, level LogLevel, msg string)
 
-// Output writes the output for a logging event.  The string s contains
-// the text to print specified by the flags of the
-// Logger.  A newline is appended if the last character of s is not
-// already a newline.  depth is used to recover the PC and is
-// provided for generality, although at the moment on all pre-defined
-// paths it will be 2.
-func (l Logo) Output(depth int, level LogLevel, msg string) {
-	l(depth, level, msg)
-}
-
-var defaultLogo = NewLogo(LevelDebug, DefaultHandler)
-
-// DefaultLogo return a global Logo instance.
-func DefaultLogo() Logo {
-	return defaultLogo
-}
-
 // NewLogo returns a new Logo function.
 func NewLogo(level LogLevel, handlers ...Handler) Logo {
 	return func(depth int, lvl LogLevel, msg string) {
@@ -33,6 +16,16 @@ func NewLogo(level LogLevel, handlers ...Handler) Logo {
 			handler.Handle(depth+2, lvl, msg)
 		}
 	}
+}
+
+// Output writes the output for a logging event.  The string s contains
+// the text to print specified by the flags of the
+// Logger.  A newline is appended if the last character of s is not
+// already a newline.  depth is used to recover the PC and is
+// provided for generality, although at the moment on all pre-defined
+// paths it will be 2.
+func (l Logo) Output(depth int, level LogLevel, msg string) {
+	l(depth, level, msg)
 }
 
 // Log messages using this level.

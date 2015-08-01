@@ -2,10 +2,7 @@ package logo
 
 import "fmt"
 
-// Log calls DefaultLogo's Log method.
-func Log(level LogLevel, format string, args ...interface{}) {
-	defaultLogo.Output(2, level, fmt.Sprintf(format, args...))
-}
+var defaultLogo = NewLogo(LevelDebug, defaultHandler)
 
 // Debug logs Debug level message.
 func Debug(format string, args ...interface{}) {

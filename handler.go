@@ -45,9 +45,9 @@ func (h Handler) Handle(depth int, level LogLevel, msg string) {
 	h(depth, level, msg)
 }
 
-// DefaultHandler format message whose level is higher than LevelDebug
+// defaultHandler format message whose level is higher than LevelDebug
 // with the LfullFlags and outputs message into stdout,
-var DefaultHandler = NewHandler(os.Stdout, LevelDebug, LfullFlags)
+var defaultHandler = NewHandler(os.Stdout, LevelDebug, LfullFlags)
 
 // NewHandler return a new Handler.
 func NewHandler(w io.Writer, level LogLevel, flag int) Handler {
