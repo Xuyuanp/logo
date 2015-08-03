@@ -19,8 +19,11 @@ package logo
 
 // Logo interface
 type Logo interface {
+	// low-level log method, all other methods call it.
 	Output(depth int, level LogLevel, msg string)
+
 	Log(level LogLevel, format string, args ...interface{})
+
 	Debug(format string, args ...interface{})
 	Info(format string, args ...interface{})
 	Warning(format string, args ...interface{})
