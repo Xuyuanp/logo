@@ -42,7 +42,6 @@ func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
 		var file string
 		var line int
 		mu.Lock()
-		defer mu.Unlock()
 		if flag&(Lshortfile|Llongfile) != 0 {
 			// release lock wihle getting caller info - it's expensive.
 			mu.Unlock()
@@ -67,6 +66,7 @@ func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
 			buf = append(buf, '\n')
 		}
 		w.Write(buf)
+		mu.Unlock()
 	})
 }
 

@@ -41,22 +41,23 @@ func OpenFile(name string, mode os.FileMode) (*RotatedFile, error) {
 		flag: os.O_APPEND | os.O_WRONLY | os.O_CREATE,
 		mode: mode,
 	}
-	return rf, rf.Open()
+	return rf, rf.open()
 }
 
-// Open opens file using the file name and mode, if the file is already opening,
+// open opens file using the file name and mode, if the file is already opening,
 // close it and reopen.
-func (rf *RotatedFile) Open() error {
+func (rf *RotatedFile) open() error {
 	rf.mu.Lock()
-	defer rf.mu.Unlock()
 	if rf.file != nil {
 		rf.file.Close()
 	}
 	file, err := os.OpenFile(rf.name, rf.flag, rf.mode)
 	if err != nil {
+		rf.mu.Unlock()
 		return err
 	}
 	rf.file = file
+	rf.mu.Unlock()
 	return nil
 }
 
@@ -69,7 +70,7 @@ func (rf *RotatedFile) Listen(sig ...os.Signal) {
 	signal.Notify(c, sig...)
 	for {
 		<-c
-		rf.Open()
+		rf.open()
 	}
 }
 

@@ -20,6 +20,7 @@ package logo
 import (
 	"crypto/tls"
 	"errors"
+	"io"
 	"net"
 	"net/smtp"
 	"strings"
@@ -96,33 +97,37 @@ func (sw *SMTPWriter) Connect() error {
 
 func (sw *SMTPWriter) Write(d []byte) (n int, err error) {
 	sw.mu.Lock()
-	defer sw.mu.Unlock()
 	if sw.cli == nil {
+		sw.mu.Unlock()
 		return -1, errors.New("client not init")
 	}
 	body := sw.buf[:]
 	body = append(body, d...)
 
-	Debug("%s", body)
-
 	for _, t := range sw.to {
-		if err := sw.cli.Rcpt(t); err != nil {
-			return -1, err
+		if err = sw.cli.Rcpt(t); err != nil {
+			sw.mu.Unlock()
+			return
 		}
 	}
-	if wc, err := sw.cli.Data(); err == nil {
-		defer wc.Close()
-		return wc.Write(body)
+	var wc io.WriteCloser
+	if wc, err = sw.cli.Data(); err == nil {
+		n, err = wc.Write(body)
+		wc.Close()
+		sw.mu.Unlock()
+		return
 	}
+	sw.mu.Unlock()
 	return
 }
 
 // Close quites SMTP client.
-func (sw *SMTPWriter) Close() error {
+func (sw *SMTPWriter) Close() (err error) {
 	sw.mu.Lock()
-	defer sw.mu.Unlock()
 	if sw.cli != nil {
-		return sw.cli.Quit()
+		err = sw.cli.Quit()
+		sw.cli = nil
 	}
-	return nil
+	sw.mu.Unlock()
+	return
 }
