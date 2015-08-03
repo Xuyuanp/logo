@@ -78,7 +78,7 @@ func Group(level LogLevel, logos ...Logo) Logo {
 			return
 		}
 		for _, l := range logos {
-			l.Output(depth, lvl, msg)
+			l.Output(depth+2, lvl, msg)
 		}
 	})
 }
