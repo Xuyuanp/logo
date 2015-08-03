@@ -17,105 +17,13 @@
 
 package logo
 
-import (
-	"fmt"
-	"io"
-	"runtime"
-	"sync"
-	"time"
-)
-
-// Logo function type
-type Logo func(depth int, level LogLevel, msg string)
-
-func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
-	var mu sync.Mutex
-	var buf []byte
-
-	return func(depth int, lvl LogLevel, msg string) {
-		// ignore low level.
-		if lvl < level {
-			return
-		}
-		now := time.Now()
-		var file string
-		var line int
-		mu.Lock()
-		defer mu.Unlock()
-		if flag&(Lshortfile|Llongfile) != 0 {
-			// release lock wihle getting caller info - it's expensive.
-			mu.Unlock()
-			var ok bool
-			_, file, line, ok = runtime.Caller(depth + 1)
-			if !ok {
-				file = "???"
-				line = 0
-			}
-			mu.Lock()
-		}
-		buf = buf[:0]
-		formatHeader(&buf, prefix, flag, now, file, line, lvl)
-		if flag&Lcolor != 0 {
-			buf = append(buf, colorMap[lvl]...)
-			buf = append(buf, msg...)
-			buf = append(buf, colorRest...)
-		} else {
-			buf = append(buf, msg...)
-		}
-		if len(msg) > 0 && msg[len(msg)-1] != '\n' {
-			buf = append(buf, '\n')
-		}
-		w.Write(buf)
-	}
-}
-
-func Group(level LogLevel, logos ...Logo) Logo {
-	return func(depth int, lvl LogLevel, msg string) {
-		if lvl < level {
-			return
-		}
-		for _, l := range logos {
-			l.Output(depth, lvl, msg)
-		}
-	}
-}
-
-// Output writes the output for a logging event.  The string s contains
-// the text to print specified by the flags of the
-// Logger.  A newline is appended if the last character of s is not
-// already a newline.  depth is used to recover the PC and is
-// provided for generality, although at the moment on all pre-defined
-// paths it will be 2.
-func (l Logo) Output(depth int, level LogLevel, msg string) {
-	l(depth, level, msg)
-}
-
-// Log messages using this level.
-func (l Logo) Log(level LogLevel, format string, args ...interface{}) {
-	l.Output(2, level, fmt.Sprintf(format, args...))
-}
-
-// Debug logs Debug level message.
-func (l Logo) Debug(format string, args ...interface{}) {
-	l.Output(2, LevelDebug, fmt.Sprintf(format, args...))
-}
-
-// Info logs Info level message.
-func (l Logo) Info(format string, args ...interface{}) {
-	l.Output(2, LevelInfo, fmt.Sprintf(format, args...))
-}
-
-// Warning logs warning level message.
-func (l Logo) Warning(format string, args ...interface{}) {
-	l.Output(2, LevelWarning, fmt.Sprintf(format, args...))
-}
-
-// Error logs Error level message.
-func (l Logo) Error(format string, args ...interface{}) {
-	l.Output(2, LevelError, fmt.Sprintf(format, args...))
-}
-
-// Critical log Critical level message.
-func (l Logo) Critical(format string, args ...interface{}) {
-	l.Output(2, LevelCritical, fmt.Sprintf(format, args...))
+// Logo interface
+type Logo interface {
+	Output(depth int, level LogLevel, msg string)
+	Log(level LogLevel, format string, args ...interface{})
+	Debug(format string, args ...interface{})
+	Info(format string, args ...interface{})
+	Warning(format string, args ...interface{})
+	Error(format string, args ...interface{})
+	Critical(format string, args ...interface{})
 }
