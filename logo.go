@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// Package logo is a light-weight log util.
 package logo
 
 // Logo interface
