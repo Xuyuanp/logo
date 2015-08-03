@@ -17,13 +17,7 @@
 
 package logo
 
-import (
-	"io"
-	"os"
-	"runtime"
-	"sync"
-	"time"
-)
+import "time"
 
 var colorMap = map[LogLevel]string{
 	LevelDebug:    "\033[36m",
@@ -53,63 +47,9 @@ const (
 	LfullFlags    = LstdFlags | Lshortfile | Lcolor
 )
 
-// Handler handles the record and formats it by using its
-// Formatter, and emit into its writer or something else.
-type Handler func(depth int, level LogLevel, msg string)
-
-// Handle call Handler function
-func (h Handler) Handle(depth int, level LogLevel, msg string) {
-	h(depth, level, msg)
-}
-
-// defaultHandler format message whose level is higher than LevelDebug
-// with the LfullFlags and outputs message into stdout,
-var defaultHandler = NewHandler(os.Stdout, LevelDebug, LfullFlags)
-
-// NewHandler return a new Handler.
-func NewHandler(w io.Writer, level LogLevel, flag int) Handler {
-	var mu sync.Mutex
-	var buf []byte
-
-	return func(depth int, lvl LogLevel, msg string) {
-		// ignore low level.
-		if lvl < level {
-			return
-		}
-		now := time.Now()
-		var file string
-		var line int
-		mu.Lock()
-		defer mu.Unlock()
-		if flag&(Lshortfile|Llongfile) != 0 {
-			// release lock wihle getting caller info - it's expensive.
-			mu.Unlock()
-			var ok bool
-			_, file, line, ok = runtime.Caller(depth + 1)
-			if !ok {
-				file = "???"
-				line = 0
-			}
-			mu.Lock()
-		}
-		buf = buf[:0]
-		formatHeader(&buf, flag, now, file, line, lvl)
-		if flag&Lcolor != 0 {
-			buf = append(buf, colorMap[lvl]...)
-			buf = append(buf, msg...)
-			buf = append(buf, colorRest...)
-		} else {
-			buf = append(buf, msg...)
-		}
-		if len(msg) > 0 && msg[len(msg)-1] != '\n' {
-			buf = append(buf, '\n')
-		}
-		w.Write(buf)
-	}
-}
-
 // Stolen from log package.
-func formatHeader(buf *[]byte, flag int, t time.Time, file string, line int, level LogLevel) {
+func formatHeader(buf *[]byte, prefix string, flag int, t time.Time, file string, line int, level LogLevel) {
+	*buf = append(*buf, prefix...)
 	if flag&(Ldate|Ltime|Lmicroseconds) != 0 {
 		if flag&Ldate != 0 {
 			year, month, day := t.Date()

@@ -22,15 +22,13 @@ import (
 	"testing"
 )
 
-func BenchmarkNewLogo(b *testing.B) {
-	benchmarkTask(b, func(i int) {
-		NewLogo(LevelDebug)
-	})
-}
+type nilWriter int
+
+func (w nilWriter) Write([]byte) (n int, err error) { return }
 
 func BenchmarkLogo(b *testing.B) {
 	var w nilWriter = 1
-	l := NewLogo(LevelDebug, NewHandler(w, LevelDebug, log.LstdFlags))
+	l := NewLogo(LevelDebug, w, "", log.LstdFlags)
 
 	benchmarkTask(b, func(i int) {
 		l.Debug("%d", i)

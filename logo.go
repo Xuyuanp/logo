@@ -17,20 +17,65 @@
 
 package logo
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"runtime"
+	"sync"
+	"time"
+)
 
 // Logo function type
 type Logo func(depth int, level LogLevel, msg string)
 
-// NewLogo returns a new Logo function.
-func NewLogo(level LogLevel, handlers ...Handler) Logo {
+func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
+	var mu sync.Mutex
+	var buf []byte
+
+	return func(depth int, lvl LogLevel, msg string) {
+		// ignore low level.
+		if lvl < level {
+			return
+		}
+		now := time.Now()
+		var file string
+		var line int
+		mu.Lock()
+		defer mu.Unlock()
+		if flag&(Lshortfile|Llongfile) != 0 {
+			// release lock wihle getting caller info - it's expensive.
+			mu.Unlock()
+			var ok bool
+			_, file, line, ok = runtime.Caller(depth + 1)
+			if !ok {
+				file = "???"
+				line = 0
+			}
+			mu.Lock()
+		}
+		buf = buf[:0]
+		formatHeader(&buf, prefix, flag, now, file, line, lvl)
+		if flag&Lcolor != 0 {
+			buf = append(buf, colorMap[lvl]...)
+			buf = append(buf, msg...)
+			buf = append(buf, colorRest...)
+		} else {
+			buf = append(buf, msg...)
+		}
+		if len(msg) > 0 && msg[len(msg)-1] != '\n' {
+			buf = append(buf, '\n')
+		}
+		w.Write(buf)
+	}
+}
+
+func Group(level LogLevel, logos ...Logo) Logo {
 	return func(depth int, lvl LogLevel, msg string) {
 		if lvl < level {
 			return
 		}
-
-		for _, handler := range handlers {
-			handler.Handle(depth+2, lvl, msg)
+		for _, l := range logos {
+			l.Output(depth, lvl, msg)
 		}
 	}
 }

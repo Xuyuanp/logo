@@ -17,9 +17,12 @@
 
 package logo
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
-var defaultLogo = NewLogo(LevelDebug, defaultHandler)
+var defaultLogo = NewLogo(LevelDebug, os.Stdout, "", LstdFlags)
 
 // Debug logs Debug level message.
 func Debug(format string, args ...interface{}) {
