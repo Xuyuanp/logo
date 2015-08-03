@@ -59,7 +59,7 @@ func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
 		if flag&Lcolor != 0 {
 			buf = append(buf, colorMap[lvl]...)
 			buf = append(buf, msg...)
-			buf = append(buf, colorRest...)
+			buf = append(buf, colorReset...)
 		} else {
 			buf = append(buf, msg...)
 		}
