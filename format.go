@@ -36,15 +36,15 @@ const (
 	// described in the comments).  A colon appears after these items:
 	//	2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message
 
-	Ldate         = 1 << iota              // the date: 2009/01/23
-	Ltime                                  // the time: 01:23:23
-	Lmicroseconds                          // microsecond resolution: 01:23:23.123123.  assumes Ltime.
-	Llongfile                              // full file name and line number: /a/b/c/d.go:23
-	Lshortfile                             // final file name element and line number: d.go:23. overrides Llongfile
-	Llevel                                 // the level name: DBUG|INFO|WARN...
-	Lcolor                                 // colorful message
-	LstdFlags     = Ldate | Ltime | Llevel // initial values for the standard logger
-	LfullFlags    = LstdFlags | Lshortfile | Lcolor
+	Ldate         = 1 << iota                       // the date: 2009/01/23
+	Ltime                                           // the time: 01:23:23
+	Lmicroseconds                                   // microsecond resolution: 01:23:23.123123.  assumes Ltime.
+	Llongfile                                       // full file name and line number: /a/b/c/d.go:23
+	Lshortfile                                      // final file name element and line number: d.go:23. overrides Llongfile
+	Llevel                                          // the level name: DBUG|INFO|WARN...
+	Lcolor                                          // colorful message
+	LstdFlags     = Ldate | Ltime | Llevel | Lcolor // initial values for the standard logger
+	LfullFlags    = LstdFlags | Lshortfile
 )
 
 // Stolen from log package.
