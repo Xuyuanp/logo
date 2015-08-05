@@ -101,8 +101,6 @@ func (sw *SMTPWriter) Write(d []byte) (n int, err error) {
 		sw.mu.Unlock()
 		return -1, errors.New("client not init")
 	}
-	body := sw.buf[:]
-	body = append(body, d...)
 
 	for _, t := range sw.to {
 		if err = sw.cli.Rcpt(t); err != nil {
@@ -110,8 +108,10 @@ func (sw *SMTPWriter) Write(d []byte) (n int, err error) {
 			return
 		}
 	}
+
 	var wc io.WriteCloser
 	if wc, err = sw.cli.Data(); err == nil {
+		body := append(sw.buf[:], d...)
 		n, err = wc.Write(body)
 		wc.Close()
 		sw.mu.Unlock()

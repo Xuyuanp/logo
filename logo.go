@@ -29,13 +29,13 @@ import (
 type Logo func(depth int, level LogLevel, msg string)
 
 // NewLogo create a new Logo which outputs log message into io.Writer.
-func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
+func NewLogo(lowest LogLevel, w io.Writer, prefix string, flag int) Logo {
 	var mu sync.Mutex
 	var buf []byte
 
 	return func(depth int, lvl LogLevel, msg string) {
 		// ignore low level.
-		if lvl < level {
+		if lvl < lowest {
 			return
 		}
 		now := time.Now()
@@ -72,15 +72,15 @@ func NewLogo(level LogLevel, w io.Writer, prefix string, flag int) Logo {
 
 // Group combines multiple Logo interface into a new Logo which
 // outputs all log message into each Logo of provided.
-func Group(level LogLevel, logos ...Logo) Logo {
-	return Logo(func(depth int, lvl LogLevel, msg string) {
-		if lvl < level {
+func Group(lowest LogLevel, logos ...Logo) Logo {
+	return func(depth int, lvl LogLevel, msg string) {
+		if lvl < lowest {
 			return
 		}
 		for _, l := range logos {
 			l.Output(depth+2, lvl, msg)
 		}
-	})
+	}
 }
 
 // Output writes the output for a logging event.  The string s contains

@@ -78,9 +78,9 @@ func (rf *RotatedFile) Listen(sig ...os.Signal) {
 func (rf *RotatedFile) Write(b []byte) (n int, err error) {
 	rf.mu.Lock()
 	if rf.file != nil {
-		n, err := rf.file.Write(b)
+		n, err = rf.file.Write(b)
 		rf.mu.Unlock()
-		return n, err
+		return
 	}
 	rf.mu.Unlock()
 	return 0, fmt.Errorf("file not opened")
