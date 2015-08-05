@@ -28,8 +28,8 @@ import (
 // Logo function type
 type Logo func(depth int, level LogLevel, msg string)
 
-// NewLogo create a new Logo which outputs log message into io.Writer.
-func NewLogo(lowest LogLevel, w io.Writer, prefix string, flag int) Logo {
+// New create a new Logo which outputs log message into io.Writer.
+func New(lowest LogLevel, w io.Writer, prefix string, flag int) Logo {
 	var mu sync.Mutex
 	var buf []byte
 

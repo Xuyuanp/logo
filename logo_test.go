@@ -35,14 +35,14 @@ func (w nilWriter) Write([]byte) (n int, err error) { return }
 func TestOutput(t *testing.T) {
 	teststr := "test"
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "", 0)
+	l := New(LevelDebug, &buf, "", 0)
 	l.Output(1, LevelDebug, teststr)
 	assertEqual(t, buf.String(), teststr+"\n")
 }
 
 func TestAPI(t *testing.T) {
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "", 0)
+	l := New(LevelDebug, &buf, "", 0)
 	logMethods := [...]func(string, ...interface{}){
 		l.Debug,
 		l.Info,
@@ -61,8 +61,8 @@ func TestAPI(t *testing.T) {
 
 func TestGroup(t *testing.T) {
 	var buf1, buf2 bytes.Buffer
-	l1 := NewLogo(LevelDebug, &buf1, "", 0)
-	l2 := NewLogo(LevelError, &buf2, "", 0)
+	l1 := New(LevelDebug, &buf1, "", 0)
+	l2 := New(LevelError, &buf2, "", 0)
 	l := Group(LevelInfo, l1, l2)
 
 	teststr := "test"
@@ -89,7 +89,7 @@ func TestLevel(t *testing.T) {
 	teststr := "test"
 	for _, level := range levels {
 		var buf bytes.Buffer
-		l := NewLogo(level, &buf, "", 0)
+		l := New(level, &buf, "", 0)
 
 		for _, lvl := range levels {
 			buf.Reset()
@@ -107,7 +107,7 @@ func TestFlagLevel(t *testing.T) {
 	levels := [...]LogLevel{LevelDebug, LevelInfo, LevelWarning, LevelError, LevelCritical}
 	var buf bytes.Buffer
 	teststr := "test"
-	l := NewLogo(LevelDebug, &buf, "", Llevel)
+	l := New(LevelDebug, &buf, "", Llevel)
 
 	for _, lvl := range levels {
 		buf.Reset()
@@ -119,7 +119,7 @@ func TestFlagLevel(t *testing.T) {
 func TestFlagDate(t *testing.T) {
 	teststr := "test"
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "", Ldate)
+	l := New(LevelDebug, &buf, "", Ldate)
 	now := time.Now()
 	l.Debug(teststr)
 	prefix := now.Format("2006/01/02")
@@ -129,21 +129,21 @@ func TestFlagDate(t *testing.T) {
 func TestFlagTime(t *testing.T) {
 	teststr := "test"
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "", Ltime|Lmicroseconds)
+	l := New(LevelDebug, &buf, "", Ltime|Lmicroseconds)
 	l.Debug(teststr)
 }
 
 func TestFlagColor(t *testing.T) {
 	teststr := "test"
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "", Lcolor)
+	l := New(LevelDebug, &buf, "", Lcolor)
 	l.Debug(teststr)
 }
 
 func TestFlagFile(t *testing.T) {
 	teststr := "test"
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "", Lshortfile)
+	l := New(LevelDebug, &buf, "", Lshortfile)
 	l.Debug(teststr)
 	_, file, line, ok := runtime.Caller(0)
 	if !ok {
@@ -158,7 +158,7 @@ func TestFlagFile(t *testing.T) {
 func TestPrefix(t *testing.T) {
 	teststr := "test"
 	var buf bytes.Buffer
-	l := NewLogo(LevelDebug, &buf, "prefix ", 0)
+	l := New(LevelDebug, &buf, "prefix ", 0)
 	l.Debug(teststr)
 
 	assertEqual(t, buf.String(), "prefix "+teststr+"\n")
@@ -169,7 +169,7 @@ func TestGlobalAPI(t *testing.T) {
 		Debug, Info, Warning, Error, Critical,
 	}
 	var w nilWriter = 1
-	defaultLogo = NewLogo(LevelDebug, w, "", 0)
+	defaultLogo = New(LevelDebug, w, "", 0)
 	for _, api := range apis {
 		api("test")
 	}
@@ -177,7 +177,7 @@ func TestGlobalAPI(t *testing.T) {
 
 func BenchmarkLogo(b *testing.B) {
 	var w nilWriter = 1
-	l := NewLogo(LevelDebug, w, "", log.LstdFlags)
+	l := New(LevelDebug, w, "", log.LstdFlags)
 
 	benchmarkTask(b, func(i int) {
 		l.Debug("%d", i)
