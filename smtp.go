@@ -40,7 +40,7 @@ type SMTPWriter struct {
 }
 
 // NewSMTPWriter create a new SMTPWriter instance.
-func NewSMTPWriter(addr, username, password, subject string, to ...string) *SMTPWriter {
+func NewSMTPWriter(addr, username, password, subject string, to ...string) (*SMTPWriter, error) {
 	sw := &SMTPWriter{
 		addr:     addr,
 		username: username,
@@ -48,11 +48,11 @@ func NewSMTPWriter(addr, username, password, subject string, to ...string) *SMTP
 		subject:  subject,
 		to:       to,
 	}
-	return sw
+	return sw, sw.connect()
 }
 
-// Connect connects to SMTP server, init the client and init buffer.
-func (sw *SMTPWriter) Connect() error {
+// connect connects to SMTP server, init the client and init buffer.
+func (sw *SMTPWriter) connect() error {
 	// init client
 	conn, err := tls.Dial("tcp", sw.addr, nil)
 	if err != nil {
