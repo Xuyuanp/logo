@@ -22,7 +22,7 @@ import (
 	"os"
 )
 
-var defaultLogo = New(LevelDebug, os.Stdout, "", LstdFlags)
+var defaultLogo = New(LevelDebug, os.Stdout, "", LdefaultFlags)
 
 // Debug logs Debug level message.
 func Debug(format string, args ...interface{}) {
