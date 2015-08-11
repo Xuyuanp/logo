@@ -25,11 +25,11 @@ import (
 	"time"
 )
 
-// Logo function type
-type Logo func(depth int, level LogLevel, msg string)
+// Logger function type
+type Logger func(depth int, level LogLevel, msg string)
 
-// New create a new Logo which outputs log message into io.Writer.
-func New(lowest LogLevel, w io.Writer, prefix string, flag int) Logo {
+// New create a new Logger which outputs log message into io.Writer.
+func New(lowest LogLevel, w io.Writer, prefix string, flag int) Logger {
 	var mu sync.Mutex
 	var buf []byte
 
@@ -70,14 +70,14 @@ func New(lowest LogLevel, w io.Writer, prefix string, flag int) Logo {
 	}
 }
 
-// Group combines multiple Logo interface into a new Logo which
-// outputs all log message into each Logo of provided.
-func Group(lowest LogLevel, logos ...Logo) Logo {
+// Group combines multiple Logger interface into a new Logger which
+// outputs all log message into each Logger of provided.
+func Group(lowest LogLevel, Loggers ...Logger) Logger {
 	return func(depth int, lvl LogLevel, msg string) {
 		if lvl < lowest {
 			return
 		}
-		for _, l := range logos {
+		for _, l := range Loggers {
 			l.Output(depth+2, lvl, msg)
 		}
 	}
@@ -89,36 +89,36 @@ func Group(lowest LogLevel, logos ...Logo) Logo {
 // already a newline.  depth is used to recover the PC and is
 // provided for generality, although at the moment on all pre-defined
 // paths it will be 2.
-func (l Logo) Output(depth int, level LogLevel, msg string) {
+func (l Logger) Output(depth int, level LogLevel, msg string) {
 	l(depth, level, msg)
 }
 
 // Log messages using this level.
-func (l Logo) Log(level LogLevel, format string, args ...interface{}) {
+func (l Logger) Log(level LogLevel, format string, args ...interface{}) {
 	l.Output(2, level, fmt.Sprintf(format, args...))
 }
 
 // Debug logs Debug level message.
-func (l Logo) Debug(format string, args ...interface{}) {
+func (l Logger) Debug(format string, args ...interface{}) {
 	l.Output(2, LevelDebug, fmt.Sprintf(format, args...))
 }
 
 // Info logs Info level message.
-func (l Logo) Info(format string, args ...interface{}) {
+func (l Logger) Info(format string, args ...interface{}) {
 	l.Output(2, LevelInfo, fmt.Sprintf(format, args...))
 }
 
 // Warning logs warning level message.
-func (l Logo) Warning(format string, args ...interface{}) {
+func (l Logger) Warning(format string, args ...interface{}) {
 	l.Output(2, LevelWarning, fmt.Sprintf(format, args...))
 }
 
 // Error logs Error level message.
-func (l Logo) Error(format string, args ...interface{}) {
+func (l Logger) Error(format string, args ...interface{}) {
 	l.Output(2, LevelError, fmt.Sprintf(format, args...))
 }
 
 // Critical log Critical level message.
-func (l Logo) Critical(format string, args ...interface{}) {
+func (l Logger) Critical(format string, args ...interface{}) {
 	l.Output(2, LevelCritical, fmt.Sprintf(format, args...))
 }
