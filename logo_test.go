@@ -169,7 +169,7 @@ func TestGlobalAPI(t *testing.T) {
 		Debug, Info, Warning, Error, Critical,
 	}
 	var w nilWriter = 1
-	defaultLogo = New(LevelDebug, w, "", 0)
+	std = New(LevelDebug, w, "", 0)
 	for _, api := range apis {
 		api("test")
 	}
