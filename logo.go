@@ -20,6 +20,7 @@ package logo
 import (
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -68,6 +69,11 @@ func New(lowest LogLevel, w io.Writer, prefix string, flag int) Logger {
 		w.Write(buf)
 		mu.Unlock()
 	}
+}
+
+// NewStd creates a new Logger using stdout.
+func NewStd(lowest LogLevel, prefix string, flags int) Logger {
+	return New(lowest, os.Stdout, prefix, flags)
 }
 
 // Group combines multiple Logger interface into a new Logger which

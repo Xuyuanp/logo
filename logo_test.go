@@ -20,6 +20,7 @@ package logo
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -27,10 +28,6 @@ import (
 	"testing"
 	"time"
 )
-
-type nilWriter int
-
-func (w nilWriter) Write([]byte) (n int, err error) { return }
 
 func TestOutput(t *testing.T) {
 	teststr := "test"
@@ -168,16 +165,14 @@ func TestGlobalAPI(t *testing.T) {
 	apis := [...]func(string, ...interface{}){
 		Debug, Info, Warning, Error, Critical,
 	}
-	var w nilWriter = 1
-	defaultLogo = New(LevelDebug, w, "", 0)
+	defaultLogo = New(LevelDebug, ioutil.Discard, "", 0)
 	for _, api := range apis {
 		api("test")
 	}
 }
 
 func BenchmarkLogo(b *testing.B) {
-	var w nilWriter = 1
-	l := New(LevelDebug, w, "", log.LstdFlags)
+	l := New(LevelDebug, ioutil.Discard, "", log.LstdFlags)
 
 	benchmarkTask(b, func(i int) {
 		l.Debug("%d", i)
@@ -185,8 +180,7 @@ func BenchmarkLogo(b *testing.B) {
 }
 
 func BenchmarkLog(b *testing.B) {
-	var w nilWriter = 1
-	logger := log.New(w, "", log.LstdFlags)
+	logger := log.New(ioutil.Discard, "", log.LstdFlags)
 
 	benchmarkTask(b, func(i int) {
 		logger.Printf("%d", i)
