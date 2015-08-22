@@ -165,7 +165,7 @@ func TestGlobalAPI(t *testing.T) {
 	apis := [...]func(string, ...interface{}){
 		Debug, Info, Warning, Error, Critical,
 	}
-	defaultLogo = New(LevelDebug, ioutil.Discard, "", 0)
+	std = New(LevelDebug, ioutil.Discard, "", 0)
 	for _, api := range apis {
 		api("test")
 	}
