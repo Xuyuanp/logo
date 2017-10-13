@@ -17,13 +17,29 @@
 
 package logo
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
-var std = NewStd(LevelDebug, "", LdefaultFlags)
+var (
+	std  = NewStd(LevelDebug, "", LdefaultFlags)
+	once sync.Once
+)
 
 // Std returns the default global Logger
 func Std() Logger {
 	return std
+}
+
+func setupGlobal(logger Logger) {
+	std = logger
+}
+
+func SetupGlobal(logger Logger) {
+	once.Do(func() {
+		std = logger
+	})
 }
 
 // Debug logs Debug level message.
